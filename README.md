@@ -43,9 +43,9 @@ Centralized save/load system using:
 2. Copy to your UEFN project's Verse directory
 3. Include the `Core` folder (required for all devices)
 4. Include `module_access.verse` and `utility.verse` 
-  - Put `module_access.verse` in your content folder directly and update with your existing folder structure as needed to resolve access errors
+   - Put `module_access.verse` in your content folder directly and update with your existing folder structure as needed to resolve access errors
 5. Compile, setup your new device(s) and launch!
-  - You should be good to go but if you have any errors and need assistance, reach out to us on Discord!
+   - You should be good to go but if you have any errors and need assistance, reach out to us on Discord!
 
 ---
 
