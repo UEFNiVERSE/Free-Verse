@@ -109,9 +109,9 @@ We welcome contributions from the UEFN community! Follow these guidelines to sub
 **License:** Open-Source (see LICENSE)
 
 **Contact:**
-- Discord: PineFruit
-- Epic: PineFruitDev
-- Twitter: @PineFruitDev
+- Discord: PineFruit, LastMadeUEFN
+- Epic: PineFruitDev, LastMadeMe
+- Twitter: @PineFruitDev; @LastMadeUefn
 
 **Resources:**
 - Each device has its own detailed README
@@ -122,4 +122,4 @@ We welcome contributions from the UEFN community! Follow these guidelines to sub
 
 ---
 
-*Powered by Project Moonlight*
+*All Verse Devices Are 100% Free and Open Source | Powered by Project Moonlight*
