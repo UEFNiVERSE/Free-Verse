@@ -49,8 +49,8 @@ Follow the official [Verse Code Style Guide](https://dev.epicgames.com/documenta
 
 ## Community
 **Get Help:**
-- GitHub Issues & Discussions
-- Discord Server: https://discord.gg/UEFNiVERSE
+- [Discord Server](https://discord.gg/UEFNiVERSE)
+- GitHub Issues
 
 **Contact:**
 - Discord DM: PineFruit, LastMadeUEFN
