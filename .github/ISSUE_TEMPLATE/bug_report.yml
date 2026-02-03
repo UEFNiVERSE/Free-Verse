@@ -1,0 +1,99 @@
+name: Bug Report
+description: Report a bug or issue with a UEFNiVERSE device
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the sections below to help us reproduce and fix the issue.
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Which device is affected?
+      description: Select the device experiencing the issue
+      options:
+        - Core (base_device, base_group_device, Saved_Data, utility)
+        - Device1 - Shared Progress Tracker
+        # - Device2 - Team Buff Zone
+        # - Device3 - Advanced Revive System
+        - Multiple devices
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Clear and concise description of the bug
+      placeholder: "Progress tracker doesn't save data when using PlayerGroup persistence mode..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior
+      placeholder: |
+        1. Add Device1 to island
+        2. Set persistence to PlayerGroup
+        3. Play session and make progress
+        4. Leave and rejoin
+        5. Progress is lost
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+      placeholder: "Progress should persist between sessions for the same player group..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happens?
+      placeholder: "Progress resets to 0 when rejoining..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console Logs / Error Messages
+      description: Paste relevant console output or error messages (if any)
+      placeholder: |
+        [Device1] Error: Failed to load saved data for key...
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Add screenshots or videos if applicable (drag and drop)
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that might help (workarounds, when it started, etc.)
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to ensure this hasn't been reported
+          required: true
+        - label: I have enabled debug logging and checked console output
+          required: false
+        - label: I am using the latest version of the device
+          required: false

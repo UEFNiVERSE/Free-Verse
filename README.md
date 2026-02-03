@@ -11,8 +11,6 @@ All devices share the same **Core** system:
 - `Saved_Data.verse` - Persistence layer for cross-session data storage
 - `utility.verse` - Shared helper functions and utilities
 
----
-
 ## Core Architecture
 All UEFNiVERSE devices extend the same base classes for consistent behavior:
 
@@ -50,60 +48,22 @@ Centralized save/load system using:
 ---
 
 ## Contributing
-We welcome contributions from the UEFN community! Follow these guidelines to submit improvements.
+We welcome contributions from the UEFN community!
 
-### How to Contribute
-1. **Fork the Repository**
-   - Create your own fork of the UEFNiVERSE repo
-2. **Create a Feature Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Make Your Changes**
-   - Follow existing code style and architecture patterns or suggest an improvement
-   - Extend `base_device` or `base_group_device` for new devices
-   - Add comprehensive inline documentation
-   - Test thoroughly in UEFN before submitting
-4. **Document Your Work**
-   - Create a `README.md` in your device folder
-   - Include: Overview, Features, Setup Guide, Configuration Reference, Examples
-   - Update main README if adding new devices
-5. **Submit a Pull Request**
-   - Push your branch to your fork
-   - Open a PR against the `main` branch
-   - Provide clear description of changes and reasoning
-   - Reference any related issues
+**👉 Read our [CONTRIBUTING.md](CONTRIBUTING.md) for complete guidelines:**
+- How to report bugs
+- How to suggest features  
+- Development prerequisites
+- Contribution workflow (fork, branch, PR)
+- Coding standards and best practices
+- PR review process
 
-### PR Review Process
-- All PRs require review before merging
-- Maintainers check for: code quality, architecture compliance, documentation completeness
-- Expect feedback within 3-5 days
-- Be responsive to review comments
-
-### Code Standards
-**Architecture:**
-- Extend existing base classes (`base_device` or `base_group_device`)
-- Use existing Core utilities (`Saved_Data`, `utility`)
-- Follow DRY and SOLID principles
-
-**Documentation:**
-- Inline comments for complex logic
-- Full device README with examples
-- Clear parameter descriptions with tooltips
-
-**Naming:**
-- Classes: `snake_case` (Verse convention)
-- Variables: `PascalCase` for public, `camelCase` for private
-- Files: `snake_case.verse`
-
-**Performance:**
-- Minimize allocations in hot paths
-- Use throttled loops for continuous operations
-- Reuse data structures where possible
+**Quick Start:** Fork → Create feature branch → Make changes → Submit PR
 
 ---
 
 ## Support
+
 **Developers:** PineFruit, LastMade  
 **Organization:** Chartis / UEFNiVERSE  
 **License:** Open-Source (see LICENSE)
@@ -111,15 +71,15 @@ We welcome contributions from the UEFN community! Follow these guidelines to sub
 **Contact:**
 - Discord: PineFruit, LastMadeUEFN
 - Epic: PineFruitDev, LastMadeMe
-- Twitter: @PineFruitDev; @LastMadeUefn
+- Twitter: @PineFruitDev, @LastMadeUefn
 
 **Resources:**
 - Each device has its own detailed README
 - Core files contain comprehensive inline documentation
-- Video walkthrough links for each device can be found in their README
+- Reach out on discord if you need anything: https://discord.gg/UEFNiVERSE
+- [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines
+
 ---
 
-
----
-
-*All Verse Devices Are 100% Free and Open Source | Powered by Project Moonlight*
+**License:** MIT License - Free and Open Source
+**Powered by:** [Project Moonlight](https://www.projectmoonlight.org/)

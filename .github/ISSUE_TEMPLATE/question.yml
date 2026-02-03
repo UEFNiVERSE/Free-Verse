@@ -1,0 +1,76 @@
+name: Question / Help
+description: Ask a question or get help with UEFNiVERSE devices
+title: "[QUESTION] "
+labels: ["question", "help-wanted"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help with UEFNiVERSE? Ask your question below!
+        
+        **Tip:** For quick answers, check the [Documentation](https://github.com/UEFNiVERSE/Free-Verse/blob/main/README.md) or join our [Discord](https://discord.gg/UEFNiVERSE).
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Which device is this about?
+      description: Select the device you need help with
+      options:
+        - Core (base_device, base_group_device, Saved_Data, utility)
+        - Device1 - Shared Progress Tracker
+        # - Device2 - Team Buff Zone
+        # - Device3 - Advanced Revive System
+        - General / Setup
+        - Multiple devices
+        - Not sure
+    validations:
+      required: false
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What do you need help with?
+      placeholder: "How do I set up persistence for PlayerGroup mode? I've followed the README but..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: attempted
+    attributes:
+      label: What have you tried?
+      description: What steps have you already taken to solve this?
+      placeholder: |
+        1. Read the Device1 README
+        2. Set Persistence Scope to PlayerGroup
+        3. Added players to groups
+        4. Still not working...
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Current Configuration
+      description: Share relevant device settings or code (if applicable)
+      placeholder: |
+        Device1 Settings:
+        - Persistence Scope: PlayerGroup
+        - Goal: 100
+        - Groups: 2 groups configured
+      render: text
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Screenshots, error messages, or anything else that might help
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm
+      options:
+        - label: I have read the device README
+          required: true
+        - label: I have searched existing issues for similar questions
+          required: true

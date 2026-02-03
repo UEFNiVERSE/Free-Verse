@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Discord Community
+    url: https://discord.gg/UEFNiVERSE
+    about: Join our Discord for questions, discussions, and real-time support
+  - name: 📖 Documentation
+    url: https://github.com/UEFNiVERSE/Free-Verse/blob/main/README.md
+    about: Read the documentation for setup guides and examples
+  - name: 🤝 Contributing Guide
+    url: https://github.com/UEFNiVERSE/Free-Verse/blob/main/CONTRIBUTING.md
+    about: Learn how to contribute to UEFNiVERSE
