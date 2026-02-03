@@ -1,4 +1,4 @@
-# UEFNiVERSE - Free-Verse Device Collection
+# 🚀 UEFNiVERSE - Free-Verse Device Collection
 Professional, production-ready Verse devices for UEFN creators. 100% free and open-source.
 Community requests are aways welcome via the UEFNiVERSE Discord!
 
