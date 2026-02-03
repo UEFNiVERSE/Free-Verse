@@ -22,6 +22,9 @@ Tracks collective progress across player groups with persistence, milestones, an
 ---
 
 ## Quick Setup
+### Video Walkthrough:
+https://www.youtube.com/watch?v=FMUW7PfTIcE
+
 ### Basic Team Objective (No Persistence)
 1. Add `Shared Progress Tracker` device to your island
 2. Create a `Group Tracker`:
@@ -128,4 +131,5 @@ Set **Debug > Enable Debug** to `Yes` to see console logs:
 
 ---
 
-*All Verse Devices Are 100% Free and Open Source | Powered by Project Moonlight*
+**License:** MIT License - Free and Open Source
+**Powered by:** [Project Moonlight](https://www.projectmoonlight.org/)
