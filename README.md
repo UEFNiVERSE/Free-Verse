@@ -1,6 +1,6 @@
 # 🚀 UEFNiVERSE - Free-Verse Device Collection
-Professional, production-ready Verse devices for UEFN creators. 100% free and open-source.
-Community requests are aways welcome via the UEFNiVERSE Discord!
+Professional, modular Verse devices for UEFN creators. 100% free and open-source.
+Community requests are always welcome via the UEFNiVERSE Discord or Issue Requests!
 
 ## Overview
 UEFNiVERSE provides reusable, well-architected Verse devices built on a shared core architecture. Each device extends a common foundation, ensuring consistency, maintainability, and ease of integration.
