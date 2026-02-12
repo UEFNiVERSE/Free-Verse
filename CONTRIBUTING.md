@@ -64,5 +64,5 @@ Your contributions help the UEFN community build better experiences.
 
 ---
 
-**License:** MIT License  
+**License:** [Apache 2.0](https://choosealicense.com/licenses/apache-2.0/) with [Commons Clause](https://commonsclause.com/)  
 **Last Updated:** February 2026

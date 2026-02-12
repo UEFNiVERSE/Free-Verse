@@ -131,5 +131,5 @@ Set **Debug > Enable Debug** to `Yes` to see console logs:
 
 ---
 
-**License:** MIT License - Free and Open Source
+**License:** [Apache 2.0](https://choosealicense.com/licenses/apache-2.0/) with [Commons Clause](https://commonsclause.com/)
 **Powered by:** [Project Moonlight](https://www.projectmoonlight.org/)
