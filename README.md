@@ -2,30 +2,43 @@
 Professional, modular Verse devices for UEFN creators. 100% free and open-source.
 Community requests are always welcome via the UEFNiVERSE Discord or Issue Requests!
 
+## License Note
+This project is licensed under **[Apache 2.0](https://choosealicense.com/licenses/apache-2.0/) + the [Commons Clause](https://commonsclause.com/)**. In plain terms:
+
+- ✅ **Free to use in your UEFN maps.** Drop these devices into any island — published or private, monetized or not — at no cost.
+- ✅ **Forking and contributing is welcome.** Fork the repo, modify the code, and open a PR. Community contributions are encouraged.
+- ❌ **You cannot sell the library itself.** The Commons Clause means you may not sell a product or service whose value derives *primarily* from this library (for example, reselling these devices as a paid pack or paid support service for them).
+
+In short: build whatever you want *with* these devices — just don't sell *them*. See [LICENSE](LICENSE) for the full terms.
+
 ## Overview
 UEFNiVERSE provides reusable, well-architected Verse devices built on a shared core architecture. Each device extends a common foundation, ensuring consistency, maintainability, and ease of integration.
 
 All devices share the same **Core** system:
-- `base_device.verse` - Foundation for all devices with debug logging and initialization
-- `base_group_device.verse` - Group management system for team/class-based gameplay
+- `base_device.verse` - Defines the `player_group` class plus the shared Core tags and tooltips used by the group system
+- `base_group_device.verse` - Defines the `base_group_device` class: the group-management foundation device that all group devices extend
 - `Saved_Data.verse` - Persistence layer for cross-session data storage
 - `utility.verse` - Shared helper functions and utilities
 
+> **Note:** `base_device.verse` and `base_group_device.verse` are both part of the `Core` module. The two classes reference each other across files, so always include both.
+
 ## Core Architecture
-All UEFNiVERSE devices extend the same base classes for consistent behavior:
+All UEFNiVERSE devices extend the same Core foundation for consistent behavior. The foundation is split across two files in the `Core` module:
 
-### base_device
-Foundation class providing:
-- Debug logging with custom identifiers
-- Initialization trigger support
-- Standardized Print methods
+### base_group_device (`base_group_device.verse`)
+The group-management foundation device that all group devices subclass. Provides:
+- Initialization trigger support and overridable lifecycle hooks (`Initialize`, `OnAgentJoined`, `OnAgentRespawned`, `OnAgentLeft`)
+- Debug logging with custom identifiers via `Logger`
+- Agent-to-group lookup utilities (`GetGroup`, `GetGroupIndex`, `GetGroups`)
+- Automatic spawner discovery via tags
 
-### base_group_device
-Extends `base_device` with player group management:
+### player_group (`base_device.verse`)
+The companion class used by `base_group_device`'s `Groups` property. Provides:
 - Dynamic group assignment/removal via triggers
-- Per-group state isolation
+- Per-group state isolation (tracks the agents in each group)
 - HUD message integration for group feedback
-- Agent-to-group lookup utilities
+
+> `player_group` and `base_group_device` live in separate files but the same `Core` module, so they reference each other directly.
 
 ### Persistence System
 Centralized save/load system using:
