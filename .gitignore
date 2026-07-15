@@ -1,0 +1,7 @@
+# OS junk
+.DS_Store
+
+# Internal business documents - never public
+proposals/
+*.pdf
+*.docx
