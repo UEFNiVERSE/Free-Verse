@@ -1,20 +1,20 @@
 #██╗   ██╗███████╗███████╗███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗███████╗
 #██║   ██║██╔════╝██╔════╝████╗  ██║██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔════╝
-#██║   ██║█████╗  █████╗  ██╔██╗ ██║██║██║   ██║█████╗  ██████╔╝███████╗█████╗  
-#██║   ██║██╔══╝  ██╔══╝  ██║╚██╗██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██╔══╝  
+#██║   ██║█████╗  █████╗  ██╔██╗ ██║██║██║   ██║█████╗  ██████╔╝███████╗█████╗
+#██║   ██║██╔══╝  ██╔══╝  ██║╚██╗██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██╔══╝
 #╚██████╔╝███████╗██║     ██║ ╚████║██║ ╚████╔╝ ███████╗██║  ██║███████║███████╗
 # ╚═════╝ ╚══════╝╚═╝     ╚═╝  ╚═══╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝
 
 # ======================================================
 # FILE: base_device.verse
 # ------------------------------------------------------
-# Defines the `player_group` class plus the shared Core tags
-# and tooltips used by the group system.
+# Defines `base_device`, the groupless foundation every
+# UEFNiVERSE device extends, plus the `player_group` class
+# and the shared Core tags and tooltips.
 #
-# The `base_group_device` class was moved to its own file,
-# base_group_device.verse. Both files are part of the Core
-# module, so `player_group` and `base_group_device` continue
-# to reference each other across files without any changes.
+# Devices that need player groups extend `base_group_device`
+# (base_group_device.verse), which inherits from `base_device`
+# and adds only the group layer.
 # ======================================================
 
 # ======================================================
@@ -47,7 +47,7 @@ GroupDisplayHUDTip <public><localizes> :message = "The HUD message device that w
 # ======================================================
 
 player_group <public> := class<concrete>:
-    
+
     # === EDITABLE PROPERTIES ===
     @editable { ToolTip := LabelTip } Label <public> : string = ""
     @editable { ToolTip := GroupAssignTriggerTip } AssignTrigger <public> : trigger_device = trigger_device{}
@@ -99,5 +99,83 @@ player_group <public> := class<concrete>:
                 Parent.Logger("Removed Agent from Group {Index}: {Label}", ?Name := LOGGER_NAME)
             else. Parent.Logger("Agent not found in Group {Index}: {Label}", ?Name := LOGGER_NAME)
 
-# NOTE: The `base_group_device` class that previously lived here has been
-# moved to base_group_device.verse (same Core module).
+# ======================================================
+# BASE DEVICE CLASS
+# ======================================================
+
+base_device <public> := class(creative_device):
+
+    # === EDITABLE PROPERTIES ===
+    @editable { ToolTip := InitTriggerTip } InitTrigger <public> : ?trigger_device = false
+    @editable { ToolTip := DebugTip } Debug <public> : debug_settings = debug_settings{}
+
+    # === INTERNAL STATE ===
+    var Spawners : []player_spawner_device = array{}
+    var ActivePlayers : []agent = array{}
+
+    # === CONFIGURATION ===
+    LOGGER_NAME<public>: string = "Base Device"
+
+    # === INITIALIZATION ===
+
+    OnBegin<override>()<suspends>:void=
+        if (Trigger := InitTrigger?). Trigger.TriggeredEvent.Await()
+
+        PreInitialize()
+
+        Initialize()
+
+        GetPlayspace().PlayerRemovedEvent().Subscribe(OnAgentRemoved)
+        GetPlayspace().PlayerAddedEvent().Subscribe(OnAgentSpawned)
+
+        SaveSpawnersFromTags()
+        for (Spawner : Spawners). Spawner.SpawnedEvent.Subscribe(OnAgentSpawned)
+
+        # Players already in the session when the device initializes never
+        # fire PlayerAddedEvent, so sweep them here. Covers solo editor
+        # sessions and anyone present before this device started.
+        for (ExistingPlayer : GetPlayspace().GetPlayers()):
+            OnAgentSpawned(ExistingPlayer)
+
+        Logger("")
+
+    # === LIFECYCLE EVENTS (PRIVATE) ===
+
+    OnAgentSpawned<private>(Agent : agent):void=
+        if (ActivePlayers.Find[Agent]). OnAgentRespawned(Agent)
+        else:
+            set ActivePlayers += array. Agent
+            OnAgentJoined(Agent)
+
+    OnAgentRemoved<private>(Agent : agent):void=
+        var NewActivePlayers : []agent = array{}
+        if (ActivePlayers.Find[Agent]):
+            for (ActivePlayer : ActivePlayers, ActivePlayer <> Agent). set NewActivePlayers += array. ActivePlayer
+            set ActivePlayers = NewActivePlayers
+            OnAgentLeft(Agent)
+
+    # === OVERRIDABLE LIFECYCLE HOOKS ===
+
+    # Runs before Initialize(). Used by subclasses that must set up state
+    # ahead of the device's own initialization (base_group_device inits
+    # its groups here).
+    PreInitialize<public>():void={}
+    Initialize<public>()<suspends>:void={}
+    OnAgentJoined<public>(Agent : agent):void={}
+    OnAgentRespawned<public>(Agent : agent):void={}
+    OnAgentLeft<public>(Agent : agent):void={}
+
+    # === HELPER FUNCTIONS ===
+
+    SaveSpawnersFromTags<private>():void=
+        set Spawners = array{}
+        TaggedSpawners := FindCreativeObjectsWithTag(t_PlayerSpawner{})
+        for (Idx -> TaggedSpawner : TaggedSpawners, Spawner := player_spawner_device[TaggedSpawner]):
+            set Spawners += array. Spawner
+
+    Logger <public> (Message : string, ?Name : string = ""):void=
+        var Label : string = ""
+        if (Debug.EnableDebug?):
+            set Label = LOGGER_NAME + " - " + Name
+            if (Message = ""). Print("[{Label}] 👋 Hello World!")
+            else. Print("[{Label}] {Message}")
