@@ -15,22 +15,38 @@ In short: build whatever you want *with* these devices — just don't sell *them
 UEFNiVERSE provides reusable, well-architected Verse devices built on a shared core architecture. Each device extends a common foundation, ensuring consistency, maintainability, and ease of integration.
 
 All devices share the same **Core** system:
-- `base_device.verse` - Defines the `player_group` class plus the shared Core tags and tooltips used by the group system
-- `base_group_device.verse` - Defines the `base_group_device` class: the group-management foundation device that all group devices extend
+- `base_device.verse` - Defines the groupless `base_device` foundation class every device extends, plus the `player_group` class and the shared Core tags and tooltips
+- `base_group_device.verse` - Defines the `base_group_device` class: extends `base_device` and adds the player group layer for devices that need groups
 - `Saved_Data.verse` - Persistence layer for cross-session data storage
 - `utility.verse` - Shared helper functions and utilities
 
 > **Note:** `base_device.verse` and `base_group_device.verse` are both part of the `Core` module. The two classes reference each other across files, so always include both.
 
+## Devices
+
+| Device | Name | What It Does | Release |
+|---|---|---|---|
+| Device1 | Shared Progress Tracker | Group progress tracking with milestones and rewards | v1.1.0 |
+| Device2 | Team Buff Zone | Zone-based tiered team buffs with VFX | v1.2.0 |
+| Device3 | Advanced Revive System | Collaborative revives with multi-tier rewards | v1.3.0 |
+| Device4 | Pro Social Feed | Island-wide social feed with help requests and thanks | v2.1.0 |
+
+Each device folder has its own README with full setup, configuration, and examples.
+
 ## Core Architecture
 All UEFNiVERSE devices extend the same Core foundation for consistent behavior. The foundation is split across two files in the `Core` module:
 
-### base_group_device (`base_group_device.verse`)
-The group-management foundation device that all group devices subclass. Provides:
-- Initialization trigger support and overridable lifecycle hooks (`Initialize`, `OnAgentJoined`, `OnAgentRespawned`, `OnAgentLeft`)
+### base_device (`base_device.verse`)
+The groupless foundation device. Provides:
+- Initialization trigger support and overridable lifecycle hooks (`PreInitialize`, `Initialize`, `OnAgentJoined`, `OnAgentRespawned`, `OnAgentLeft`)
 - Debug logging with custom identifiers via `Logger`
-- Agent-to-group lookup utilities (`GetGroup`, `GetGroupIndex`, `GetGroups`)
 - Automatic spawner discovery via tags
+
+### base_group_device (`base_group_device.verse`)
+Extends `base_device` for devices that need player groups. Adds:
+- The `Groups` editable array
+- Agent-to-group lookup utilities (`GetGroup`, `GetGroupIndex`, `GetGroups`)
+- Group initialization ahead of device startup via `PreInitialize`
 
 ### player_group (`base_device.verse`)
 The companion class used by `base_group_device`'s `Groups` property. Provides:
