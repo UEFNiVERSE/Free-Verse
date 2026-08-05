@@ -29,7 +29,7 @@ All devices share the same **Core** system:
 | Device1 | Shared Progress Tracker | Group progress tracking with milestones and rewards | v1.1.0 |
 | Device2 | Team Buff Zone | Zone-based tiered team buffs with VFX | v1.2.0 |
 | Device3 | Advanced Revive System | Collaborative revives with multi-tier rewards | v1.3.0 |
-| Device4 | Pro Social Feed | Island-wide social feed with help requests and thanks | v2.1.0 (in testing) |
+| Device4 | Pro Social Feed | Island-wide social feed with help requests and thanks | v2.1.0 |
 
 Each device folder has its own README with full setup, configuration, and examples.
 
