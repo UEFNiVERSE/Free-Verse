@@ -27,6 +27,8 @@ The feed is island-wide. One device serves the whole island, and every player se
 ### Video Walkthrough:
 TODO: walkthrough video not yet recorded for this device.
 
+### Setup
+
 1. Copy the repo's `UMG/Device4_SocialFeed` folder into your project's Content drawer at `UMG/Device4_SocialFeed` (the path must match so the Verse import path `UMG.Device4_SocialFeed` resolves)
 2. Copy `VerseCode/Device4/`, the `Core` folder, and `utility.verse` into your project, and make sure `module_access.verse` declares both the `VerseCode` modules and the `UMG` block (see this repo's `module_access.verse`)
 3. Place one Pro Social Feed device on your island
