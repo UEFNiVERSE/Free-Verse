@@ -24,6 +24,9 @@ The feed is island-wide. One device serves the whole island, and every player se
 
 ## Quick Start
 
+### Video Walkthrough:
+TODO: walkthrough video not yet recorded for this device.
+
 1. Copy the repo's `UMG/Device4_SocialFeed` folder into your project's Content drawer at `UMG/Device4_SocialFeed` (the path must match so the Verse import path `UMG.Device4_SocialFeed` resolves)
 2. Copy `VerseCode/Device4/`, the `Core` folder, and `utility.verse` into your project, and make sure `module_access.verse` declares both the `VerseCode` modules and the `UMG` block (see this repo's `module_access.verse`)
 3. Place one Pro Social Feed device on your island
@@ -99,6 +102,48 @@ All visibilities should default to false inside the widget; the Verse only write
 
 ## Settings & Configuration
 
+### Configuration Reference
+
+#### `pro_social_feed` (Main Device)
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `Settings` | `feed_settings` | `feed_settings{}` | Feed behavior block, see below |
+| `HelpOptions` | `[]help_option` | `array{}` | Help categories players pick from, first 5 shown |
+| `EventWires` | `[]feed_event_wire` | `array{}` | No-code trigger intake into the feed |
+| `OpenFeedInput` | `?input_trigger_device` | `false` | Input that opens and closes the feed |
+| `OpenFeedTrigger` | `?trigger_device` | `false` | Optional trigger that opens the feed for the activating player |
+| `HelpRequestedOutput` | `trigger_device` | `trigger_device{}` | Fires on any help request, passes the requesting agent |
+| `ThanksGivenOutput` | `trigger_device` | `trigger_device{}` | Fires when thanks are given, passes the thanked agent |
+| `EntryPostedOutput` | `trigger_device` | `trigger_device{}` | Fires on every entry, passes the related agent when there is one |
+| `InitTrigger` | `?trigger_device` | `false` | Inherited from `base_device`. If assigned, the device waits for this trigger before initializing |
+| `Debug` | `debug_settings` | `debug_settings{}` | Inherited from `base_device`. Set `EnableDebug` to true for the log lines listed under Debugging |
+
+#### `feed_settings`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `ActionCooldown` | `float` | `30.0` | Seconds between social actions, shared by help and thanks |
+| `ShowJoinMessages` | `logic` | `true` | Announce when a player joins the island |
+| `ShowLeaveMessages` | `logic` | `false` | Announce when a player leaves the island |
+
+#### `help_option`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `Label` | `string` | `""` | Category shown in the help list and in the posted line |
+| `CustomMessage` | `string` | `""` | Optional replacement feed text for this category |
+| `HelpRequestedOutput` | `trigger_device` | `trigger_device{}` | Fires when this category is requested, passes the requesting agent |
+
+#### `feed_event_wire`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `Label` | `string` | `""` | Organizational label, internal use only |
+| `SourceTrigger` | `trigger_device` | `trigger_device{}` | Trigger this wire listens to |
+| `Message` | `string` | `""` | Feed text posted when the trigger fires |
+| `ShowPlayerName` | `logic` | `true` | Prefix the message with the player's name when the trigger passes an agent |
+
 ### Feed Settings
 
 ```verse
@@ -110,7 +155,18 @@ feed_settings := class<concrete>:
 
 **ActionCooldown** (30.0 seconds)
 - A player who requests help or gives thanks must wait this long before either action again
+- The cooldown is one shared timer, not one per action type
 - Recommended: 20-60 seconds depending on how busy your island gets
+
+**ShowJoinMessages** (true)
+- If `true`: the feed posts "PlayerName joined the island!" as each player arrives
+- If `false`: joins are silent and the feed starts empty
+- Recommended: `true`, it gives a new player something to look at immediately
+
+**ShowLeaveMessages** (false)
+- If `true`: the feed posts "PlayerName left the island." as each player departs
+- If `false`: departures are silent
+- Recommended: `false` on high-churn islands, where leave spam crowds out real activity
 
 ### Help Options
 
@@ -121,7 +177,19 @@ help_option := class<concrete><unique>:
     HelpRequestedOutput: trigger_device   # Fires when this category is requested
 ```
 
-Leave `HelpOptions` empty for the single generic request flow. Add up to 5 options like "a revive", "materials", or "boss fight backup" so requests read naturally: "PlayerName needs help with a revive". If `CustomMessage` is set, the feed shows "[HELP] PlayerName: CustomMessage" instead. Every editable's tooltip shows its exact output format.
+Leave `HelpOptions` empty for the single generic request flow. Add up to 5 options like "a revive", "materials", or "boss fight backup" so requests read naturally: "PlayerName needs help with a revive". Every editable's tooltip shows its exact output format.
+
+**Label** (empty)
+- Shown as the row text in the help list, and used in the posted line as "[HELP] PlayerName needs help with Label"
+- Word it to read after "needs help with"
+
+**CustomMessage** (empty)
+- If set, the posted line becomes "[HELP] PlayerName: CustomMessage" and `Label` is used only for the list row
+- Leave empty to keep the standard wording
+
+**HelpRequestedOutput** (unbound trigger)
+- Fires only for this category, in addition to the device-wide `HelpRequestedOutput`
+- Passes the requesting agent
 
 ### Event Wires
 
@@ -135,10 +203,44 @@ feed_event_wire := class<concrete>:
 
 Wire any device's output through a trigger into the feed. Example: wire an elimination manager's output with the message "just cleared the arena!" and `ShowPlayerName` enabled.
 
+**Label** (empty)
+- Never shown to players. It only labels the entry in the UEFN details panel
+
+**SourceTrigger** (unbound trigger)
+- The wire subscribes to this trigger's `TriggeredEvent` at initialization
+- Wires added at runtime are not supported, configure them in the editor
+
+**Message** (empty)
+- Posted verbatim, or after the player's name when `ShowPlayerName` is on and the trigger passes an agent
+- Write it to read after a name, so "just cleared the arena!" beats "Arena cleared"
+
+**ShowPlayerName** (true)
+- If `true` and the trigger passes an agent: the line reads "PlayerName Message"
+- If `false`, or the trigger passes no agent: the line is just `Message`
+
 ### Inputs
 
 - **OpenFeedInput** (`?input_trigger_device`): the button players press to open and close the feed
 - **OpenFeedTrigger** (`?trigger_device`): optional alternative open path for button or zone based setups
+
+Both paths call the same toggle, so a device can offer either or both. Neither is required, but with neither assigned players can only watch the feed, never open it.
+
+### Output Triggers
+
+**HelpRequestedOutput**
+- Fires on every help request, whichever category was picked and including the generic request
+- Passes the requesting agent
+- Use for: audio cues, HUD pings, marker spawning
+
+**ThanksGivenOutput**
+- Fires when thanks are given, passing the thanked agent rather than the thanker
+- When there is nobody else on the island, the island-wide thanks fires this with no agent
+- Use for: rewarding helpful players with items, XP, or score
+
+**EntryPostedOutput**
+- Fires on every entry that reaches the feed, including help, thanks, joins, leaves, wires, and Verse API posts
+- Passes the related agent for help and thanks entries, and no agent otherwise
+- Use for: sound on new feed activity, or counting island events
 
 ---
 
@@ -222,21 +324,60 @@ The device only touches widgets when something changes: a posted entry refreshes
 
 ## Best Practices
 
-**Feed volume:**
-- Aggressive event wiring works well: the rolling window keeps the feed fresh without cleanup logic
+### Performance Optimization
+
+**Feed Volume:**
+- Aggressive event wiring is safe: the rolling window caps history at 25 entries with no cleanup logic
+- Every posted entry refreshes the feed lines for every mounted widget, so cost scales with players on the island times entries posted
+- Keep very high frequency triggers (per elimination on a large island) off the feed, or gate them behind a summary trigger
+
+**Message Length:**
 - Keep wire messages short so lines do not wrap awkwardly at your chosen widget size
+- Long lines cost nothing at runtime, they just push the readable feed off screen
 
-**Help options:**
-- Word labels to follow "needs help with", so "a revive" beats "Need a revive"
-- Maximum 5 options are shown; extra configured options are ignored and logged
+**Device Count:**
+- One Pro Social Feed per island. A second device mounts a second widget on every player and doubles the refresh work
 
-**Cooldown:**
+### Design Considerations
+
+**Cooldown Tuning:**
 - Do not set `ActionCooldown` too low. A spammed feed teaches players to ignore it
 - The cooldown is shared: one thank you also delays that player's next help request
+- Recommended: 20-60 seconds, higher on busy islands
 
-**Placement:**
-- One Pro Social Feed per island. It is designed as a single island-wide feed
-- Groups from the Core architecture have no effect on this device; the feed does not scope through player groups
+**Help Option Wording:**
+- Word labels to follow "needs help with", so "a revive" beats "Need a revive"
+- Reach for `CustomMessage` when a category will not read naturally in that pattern
+
+**Join and Leave Noise:**
+- `ShowJoinMessages` gives an arriving player immediate proof the feed is live
+- `ShowLeaveMessages` is off by default for a reason: on a high-churn island, departures crowd out real activity
+
+**Scoping:**
+- The feed is island-wide by design. Groups from the Core architecture have no effect on this device, because it extends `base_device` rather than `base_group_device`
+- If you need per-team feeds, that is a separate device, not a configuration of this one
+
+### Common Pitfalls
+
+❌ **More than 5 help options configured**
+- Only the first 5 reach the widget, the rest are silently unreachable
+- Solution: keep to 5. The device logs a warning at initialization when you exceed it
+
+❌ **No open path assigned**
+- With neither `OpenFeedInput` nor `OpenFeedTrigger` set, players can watch the feed but never open it, so help and thanks are unreachable
+- Solution: always assign at least one
+
+❌ **Empty wire message**
+- A wire with an empty `Message` and `ShowPlayerName` off posts a blank line that still consumes a feed slot
+- Solution: always give a wire real text
+
+❌ **Expecting `ThanksGivenOutput` to pass the thanker**
+- It passes the player who was thanked, so rewards land on the helper
+- Solution: if you need the thanker, use `EntryPostedOutput` or a per-option help output instead
+
+❌ **Restyling the widget without keeping the binding names**
+- The Verse writes `Visiblity_N` and the other names exactly as spelled in The Widget section
+- Solution: keep every binding name, including the `Visiblity` spelling, when building a custom WBP
 
 ---
 
@@ -246,9 +387,12 @@ The device only touches widgets when something changes: a posted entry refreshes
 
 Enable debug mode in the device's Debug settings. Key log messages:
 - `"Initialized with X help option(s) and Y event wire(s)"` - device started
-- `"Agent joined, ticker mounted"` - per-player widget creation
+- `"Agent joined, feed mounted (N tracked)"` - per-player widget creation
+- `"Agent left, feed removed (N tracked)"` - per-player widget teardown
 - `"Help request posted"` / `"Thanks posted"` - action went through
+- `"Island-wide thanks posted"` - thanks sent with nobody else on the island
 - `"Help request blocked by cooldown"` / `"Thanks blocked by cooldown"` - player on cooldown
+- `"More than 5 help options configured, only the first 5 are shown"` - configuration warning at initialization
 
 ### Common Issues
 
