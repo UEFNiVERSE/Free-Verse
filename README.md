@@ -24,12 +24,12 @@ All devices share the same **Core** system:
 
 ## Devices
 
-| Device | Name | What It Does | Release |
-|---|---|---|---|
-| Device1 | Shared Progress Tracker | Group progress tracking with milestones and rewards | v1.1.0 |
-| Device2 | Team Buff Zone | Zone-based tiered team buffs with VFX | v1.2.0 |
-| Device3 | Advanced Revive System | Collaborative revives with multi-tier rewards | v1.3.0 |
-| Device4 | Pro Social Feed | Island-wide social feed with help requests and thanks | v2.1.0 |
+| Device | Name | What It Does | Author(s) | Release |
+|---|---|---|---|---|
+| Device1 | Shared Progress Tracker | Group progress tracking with milestones and rewards | LastMade, PineFruit | v1.1.0 |
+| Device2 | Team Buff Zone | Zone-based tiered team buffs with VFX | LastMade, PineFruit | v1.2.0 |
+| Device3 | Advanced Revive System | Collaborative revives with multi-tier rewards | LastMade, PineFruit | v1.3.0 |
+| Device4 | Pro Social Feed | Island-wide social feed with help requests and thanks | PineFruit | v2.1.0 |
 
 Each device folder has its own README with full setup, configuration, and examples.
 
@@ -93,7 +93,7 @@ We welcome contributions from the UEFN community!
 
 ## Support
 
-**Developers:** PineFruit, LastMade  
+**Maintainers:** PineFruit, LastMade — per-device authors are listed in the [Devices](#devices) table  
 **Organization:** Chartis / UEFNiVERSE  
 **License:** Open-Source (see LICENSE)
 
