@@ -1,30 +1,72 @@
-# Replace "my_device" with your device name throughout this file
+#██╗   ██╗███████╗███████╗███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗███████╗
+#██║   ██║██╔════╝██╔════╝████╗  ██║██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔════╝
+#██║   ██║█████╗  █████╗  ██╔██╗ ██║██║██║   ██║█████╗  ██████╔╝███████╗█████╗
+#██║   ██║██╔══╝  ██╔══╝  ██║╚██╗██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██╔══╝
+#╚██████╔╝███████╗██║     ██║ ╚████║██║ ╚████╔╝ ███████╗██║  ██║███████║███████╗
+# ╚═════╝ ╚══════╝╚═╝     ╚═╝  ╚═══╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝
+
+# ======================================================
+# FILE: my_device.verse
+# ------------------------------------------------------
+# Starting point for a new UEFNiVERSE device. Replace
+# "my_device" with your device name throughout, rename
+# the folder and this file to match, and add the folder
+# to module_access.verse.
+#
+# This template extends `base_group_device`, which adds
+# the player group layer. If your device does not need
+# groups, extend `Core.base_device` instead and drop the
+# Groups property from your setup.
+# ======================================================
+
+# ======================================================
+# IMPORTS
+# ======================================================
+
 using { /Fortnite.com/Devices }
-using { /Verse.org/Simulation }
 using { /UnrealEngine.com/Temporary/Diagnostics }
+using { /Verse.org/Simulation }
 
-# TODO: Update the module path to match your device folder name
-my_device_module := module:
-    my_device<public> := class(base_group_device):
-        # ---- Editable properties ----
-        @editable @tooltip("Example property — replace with your own")
-        ExampleProperty<public> : int = 10
+using { Core }
 
-        # ---- Lifecycle hooks ----
-        # Called once when the device starts (or when InitTrigger fires)
-        Initialize<override>()<suspends> : void =
-            Logger().Print("my_device initialized")
-            # TODO: your setup logic here
+# ======================================================
+# TOOLTIPS
+# ======================================================
+# Tooltips are localized messages declared at file scope, then referenced
+# from @editable properties. Core already provides LabelTip and DebugTip.
 
-        # Called when a player joins the group
-        OnAgentJoined<override>(Agent : agent) : void =
-            Logger().Print("Player joined: {Agent}")
-            # TODO: your per-player join logic here
+ExamplePropertyTip <public><localizes> :message = "Replace this with a description of your own property."
 
-        # Called when a player respawns
-        OnAgentRespawned<override>(Agent : agent) : void =
-            # TODO: your respawn logic here
+# ======================================================
+# MY DEVICE
+# ======================================================
 
-        # Called when a player leaves the group
-        OnAgentLeft<override>(Agent : agent) : void =
-            # TODO: your leave logic here
+my_device := class(Core.base_group_device):
+
+    # === EDITABLE PROPERTIES ===
+    @editable { ToolTip := ExamplePropertyTip } ExampleProperty <public>: int = 10
+
+    # === CONFIGURATION ===
+    # Prefixes every debug line this device logs.
+    LOGGER_NAME <override>: string = "My Device"
+
+    # === INITIALIZATION ===
+    # Runs once at startup, or after InitTrigger fires if one is assigned.
+    # base_device has already swept players who were present before this
+    # device started, so there is no need to do that here.
+
+    Initialize<override>()<suspends>:void=
+        Logger("Initialized with ExampleProperty = {ExampleProperty}")
+
+    # === LIFECYCLE EVENTS ===
+    # Logger's second argument is optional and labels the line's source,
+    # which is useful once a device logs from more than one place.
+
+    OnAgentJoined<override>(Agent : agent):void=
+        Logger("Agent joined the island", ?Name := "Lifecycle")
+
+    OnAgentRespawned<override>(Agent : agent):void=
+        Logger("Agent respawned", ?Name := "Lifecycle")
+
+    OnAgentLeft<override>(Agent : agent):void=
+        Logger("Agent left the island", ?Name := "Lifecycle")
