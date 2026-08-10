@@ -84,6 +84,8 @@ _TODO: worked example._
 - Announcement text goes through a HUD Message device, and `SetText` clamps to 150 characters
 - Attendance is per session. Nothing about hype events persists across sessions
 - An event with attendance tiers but no gather zone logs a warning at startup, because its tiers can never fire
+- Attendance is recorded before outputs fire, so reading `GetPeakAttendance` from inside an `AgentJoinedEventOutput` handler already includes the player who just arrived
+- `PeakAttendance` resets at the start of each run, not across runs. `GetRunCount` is the one counter that accumulates for the whole session
 
 ---
 

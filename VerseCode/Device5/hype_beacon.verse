@@ -76,6 +76,14 @@ LocEventStarted <localizes> (Label : string):message = "{Label} has begun!"
 LocEventEnded <localizes> (Label : string):message = "{Label} has ended."
 
 # ======================================================
+# CONSTANTS
+# ======================================================
+
+# Idle heartbeat for a race branch that must stay alive without doing
+# anything. Long enough to cost nothing, short enough to stay readable.
+IDLE_TICK <public>: float = 60.0
+
+# ======================================================
 # ENUMS
 # ======================================================
 
@@ -319,22 +327,31 @@ hype_event_runner := class:
         Log("'{Config.Label}' ended after {GetSimulationElapsedTime() - StartedAt}s, peak attendance {PeakAttendance}", ?Name := "Event")
 
     RunPulseLoop<private>()<suspends>:void=
-        if (Config.Settings.PulseInterval <= 0.0):
-            # No pulse configured. Sleep forever so this racer never completes
-            # and never ends the event on its own.
-            StopSignal.Await()
-        else:
+        if (Config.Settings.PulseInterval > 0.0):
             loop:
                 Sleep(Config.Settings.PulseInterval)
                 Config.PulseOutput.Trigger()
+        else:
+            # No pulse configured, but this branch still must never complete or
+            # it would end the race and with it the event. It idles rather than
+            # awaiting StopSignal, because that signal is already awaited by a
+            # sibling branch and two subscriptions to one event inside a single
+            # race is an assumption not worth making. The stop path is unaffected.
+            loop:
+                Sleep(IDLE_TICK)
 
     # === ATTENDANCE ===
     # The zone is tracked whether or not an event is running, so a creator can
     # watch it fill during the countdown. Tiers are only evaluated mid-event.
 
+    # Attendance bookkeeping happens on arrival, before any output fires, so a
+    # creator reading GetPeakAttendance from inside an AgentJoinedEventOutput
+    # handler sees the arrival that caused it rather than the previous peak.
     OnAgentEntered<private>(Agent : agent):void=
         if (not AgentsInZone.Find[Agent]):
             set AgentsInZone += array{Agent}
+            if (AgentsInZone.Length > PeakAttendance):
+                set PeakAttendance = AgentsInZone.Length
             if (IsRunning?):
                 Config.AgentJoinedEventOutput.Trigger(Agent)
                 EvaluateTiers()
@@ -349,9 +366,6 @@ hype_event_runner := class:
         OnAgentExited(Agent)
 
     EvaluateTiers<private>():void=
-        if (AgentsInZone.Length > PeakAttendance):
-            set PeakAttendance = AgentsInZone.Length
-
         if (AgentsInZone.Length < Config.Settings.RequireMinimumAttendance):
             return
 
