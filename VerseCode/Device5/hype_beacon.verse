@@ -178,11 +178,46 @@ hype_event_runner := class:
     var SortedSteps : []hype_countdown_step = array{}
     var IsRunning <public>: logic = false
     var StartedAt : float = 0.0
-    var AgentsInZone <public>: []agent = array{}
     var PeakAttendance <public>: int = 0
     var RunCount <public>: int = 0
-    var TiersFired : [int]logic = map{}
     StopSignal : event() = event(){}
+
+    # Neither of these two is read or written directly anywhere outside the
+    # accessors immediately below. Events here are island-wide, so one flat
+    # list and one flat map is all they need. If group filtering is ever added
+    # these become [int][]agent and [int][int]logic keyed by group index, and
+    # only the accessor bodies change rather than every call site. That is the
+    # whole cost of keeping the door open, and it is a cost worth paying
+    # because it also happens to be the tidier way to write it.
+    var AgentsInZone : []agent = array{}
+    var TiersFired : [int]logic = map{}
+
+    # === ATTENDANCE STORAGE ===
+
+    Attendees <public>()<transacts>:[]agent= AgentsInZone
+
+    AttendanceCount <public>()<transacts>:int= AgentsInZone.Length
+
+    IsAttending <public>(Agent : agent)<transacts>:logic=
+        if (AgentsInZone.Find[Agent]). true else. false
+
+    AddAttendee <private>(Agent : agent):void=
+        if (not AgentsInZone.Find[Agent]):
+            set AgentsInZone += array{Agent}
+
+    RemoveAttendee <private>(Agent : agent):void=
+        set AgentsInZone = for (Present : AgentsInZone, Present <> Agent). Present
+
+    # === TIER BOOKKEEPING ===
+
+    HasTierFired <private>(TierIndex : int)<transacts>:logic=
+        if (Fired := TiersFired[TierIndex]). Fired else. false
+
+    MarkTierFired <private>(TierIndex : int):void=
+        if (set TiersFired[TierIndex] = true){}
+
+    ResetTiersFired <private>():void=
+        set TiersFired = map{}
 
     # === INITIALIZATION ===
 
@@ -292,8 +327,8 @@ hype_event_runner := class:
         set IsRunning = true
         set StartedAt = GetSimulationElapsedTime()
         set RunCount += 1
-        set TiersFired = map{}
-        set PeakAttendance = AgentsInZone.Length
+        ResetTiersFired()
+        set PeakAttendance = AttendanceCount()
 
         AnnounceMessage(LocEventStarted(Config.Label))
         Config.StartedOutput.Trigger()
@@ -348,17 +383,17 @@ hype_event_runner := class:
     # creator reading GetPeakAttendance from inside an AgentJoinedEventOutput
     # handler sees the arrival that caused it rather than the previous peak.
     OnAgentEntered<private>(Agent : agent):void=
-        if (not AgentsInZone.Find[Agent]):
-            set AgentsInZone += array{Agent}
-            if (AgentsInZone.Length > PeakAttendance):
-                set PeakAttendance = AgentsInZone.Length
+        if (not IsAttending(Agent)?):
+            AddAttendee(Agent)
+            if (AttendanceCount() > PeakAttendance):
+                set PeakAttendance = AttendanceCount()
             if (IsRunning?):
                 Config.AgentJoinedEventOutput.Trigger(Agent)
                 EvaluateTiers()
 
     OnAgentExited<private>(Agent : agent):void=
-        if (AgentsInZone.Find[Agent]):
-            set AgentsInZone = for (Present : AgentsInZone, Present <> Agent). Present
+        if (IsAttending(Agent)?):
+            RemoveAttendee(Agent)
 
     # Called by the device when a player disconnects, so a stale agent cannot
     # sit in the list inflating attendance forever.
@@ -366,26 +401,23 @@ hype_event_runner := class:
         OnAgentExited(Agent)
 
     EvaluateTiers<private>():void=
-        if (AgentsInZone.Length < Config.Settings.RequireMinimumAttendance):
+        Present := AttendanceCount()
+
+        if (Present < Config.Settings.RequireMinimumAttendance):
             return
 
-        for (Idx -> Tier : Config.AttendanceTiers, AgentsInZone.Length >= Tier.PlayersRequired):
-            var AlreadyFired : logic = false
-            if (Fired := TiersFired[Idx], Fired?):
-                set AlreadyFired = true
-
-            if (AlreadyFired = false):
-                if (set TiersFired[Idx] = true){}
-                for (Agent : AgentsInZone):
-                    Tier.ReachedOutput.Trigger(Agent)
-                    if (Player := player[Agent]):
-                        for (VFX : Tier.VisualsDevices):
-                            VFX.Pickup(Player)
-                Log("tier '{Tier.Label}' reached with {AgentsInZone.Length} player(s)", ?Name := "Attendance")
+        for (Idx -> Tier : Config.AttendanceTiers, Present >= Tier.PlayersRequired, not HasTierFired(Idx)?):
+            MarkTierFired(Idx)
+            for (Agent : Attendees()):
+                Tier.ReachedOutput.Trigger(Agent)
+                if (Player := player[Agent]):
+                    for (VFX : Tier.VisualsDevices):
+                        VFX.Pickup(Player)
+            Log("tier '{Tier.Label}' reached with {Present} player(s)", ?Name := "Attendance")
 
     ClearTierVisuals<private>():void=
         if (Clear := ClearDevice?):
-            for (Agent : AgentsInZone, Player := player[Agent]):
+            for (Agent : Attendees(), Player := player[Agent]):
                 Clear.Pickup(Player)
 
     # === TRIGGER HANDLERS ===
@@ -489,7 +521,7 @@ hype_beacon := class(Core.base_device):
 
     GetAttendance <public>(Index : int)<transacts>:int=
         if (Runner := Runners[Index]):
-            Runner.AgentsInZone.Length
+            Runner.AttendanceCount()
         else:
             0
 
