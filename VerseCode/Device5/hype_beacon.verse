@@ -305,13 +305,20 @@ hype_event_runner := class:
         if (PrevSeconds > 0.0):
             Sleep(PrevSeconds)
 
+    # SecondsBefore is a float so the countdown arithmetic stays in one type,
+    # but "{60.0}" renders as "60.000000", which is not something to put in
+    # front of a player. Announcements go through the whole-number form and
+    # fall back to the raw value only if the conversion refuses.
+    SecondsLabel<private>(Seconds : float)<transacts>:string=
+        if (Whole := Round[Seconds]). "{Whole}" else. "{Seconds}"
+
     FireCountdownStep<private>(Step : hype_countdown_step):void=
         Step.CountdownOutput.Trigger()
         if (Step.Message <> ""):
             Announce(Step.Message)
         else:
-            AnnounceMessage(LocCountdown(Config.Label, "{Step.SecondsBefore}"))
-        Log("countdown step at {Step.SecondsBefore}s", ?Name := "Countdown")
+            AnnounceMessage(LocCountdown(Config.Label, SecondsLabel(Step.SecondsBefore)))
+        Log("countdown step at {SecondsLabel(Step.SecondsBefore)}s", ?Name := "Countdown")
 
     # === RUNNING AN EVENT ===
 

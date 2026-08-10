@@ -303,10 +303,12 @@ Set `Debug.EnableDebug` to true on the device. Lines are prefixed `[Hype Beacon 
 
 ```
 [Hype Beacon - Init] Initialized 'Loot Rain' with 2 countdown step(s) and 0 tier(s)
-[Hype Beacon - Countdown] countdown step at 60.000000s
+[Hype Beacon - Countdown] countdown step at 60s
 [Hype Beacon - Event] 'Loot Rain' started (run 1)
 [Hype Beacon - Event] 'Loot Rain' ended after 45.000000s, peak attendance 0
 ```
+
+Countdown seconds are rendered as whole numbers in both announcements and logs. Elapsed times in the end-of-event line are raw floats, since they are diagnostic rather than player facing.
 
 ### Common Issues
 
@@ -406,4 +408,23 @@ StopSignal         : event()                 # ends the event race
 
 ## Support
 
-Questions, bug reports and feature requests: the [UEFNiVERSE Discord](https://github.com/UEFNiVERSE/Free-Verse) or a GitHub issue on the repo.
+**Part of UEFNiVERSE** - Professional Verse devices for UEFN creators
+**Developer:** PineFruit | **Organization:** Chartis / UEFNiVERSE
+
+**Resources:**
+- [Main Repository](https://github.com/UEFNiVERSE/Free-Verse) - Full device collection
+- Source: `Device5/hype_beacon.verse`
+- Dependencies: `Core/base_device.verse`, `Core/base_group_device.verse`, `utility.verse`
+- Inline code documentation for detailed implementation
+
+**Contact:**
+- Discord: https://discord.gg/UEFNiVERSE
+- Epic: PineFruitDev
+- Twitter: @PineFruitDev
+
+**Contributions:** See main repository for contribution guidelines
+
+---
+
+**License:** [Apache 2.0](https://choosealicense.com/licenses/apache-2.0/) with [Commons Clause](https://commonsclause.com/)
+**Powered by:** [Project Moonlight](https://www.projectmoonlight.org/)
