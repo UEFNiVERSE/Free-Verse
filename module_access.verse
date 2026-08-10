@@ -7,6 +7,7 @@ VerseCode <public> := module:
     Device2 <public> := module:
     Device3 <public> := module:
     Device4 <public> := module:
+    Device5 <public> := module:
 
 UMG <public> := module:
     Device4_SocialFeed  <public> := module:
