@@ -290,6 +290,7 @@ The beacon handles the announcement, countdown and cleanup, and your logic decid
 - **Attendance tiers with no gather zone.** They can never fire. The device logs a warning at startup
 - **`UntilTriggered` with no `StopTrigger`.** The event never ends. Also logged at startup
 - **A countdown longer than the interval containing it.** Clamped to zero and logged, but the schedule is not what you intended
+- **Expecting a blocked run to still announce.** With `AllowOverlapping` off, a cycle blocked by another running event is skipped before its countdown starts, so players hear nothing rather than a countdown to an event that never arrives
 - **Expecting tiers to deactivate.** They are milestones, not states. Use Device2's Team Buff Zone if you want buffs that come and go with the crowd
 - **Announcements over 150 characters.** `hud_message_device.SetText` clamps them
 

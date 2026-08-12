@@ -271,6 +271,19 @@ hype_event_runner := class:
 
     # === SCHEDULING ===
 
+    # Checked before the countdown as well as inside RunEvent. Without the
+    # early check, a run blocked by an overlap would announce a full countdown
+    # to the island and then quietly do nothing, which is a worse outcome than
+    # staying silent. The check inside RunEvent stays as the backstop for
+    # manual starts and for an overlap that appears during the countdown.
+    CanStartNow<private>()<transacts>:logic=
+        var Allowed : logic = true
+        if (IsRunning?):
+            set Allowed = false
+        if (Manager.AllowOverlapping = false, Manager.AnyEventRunning()?):
+            set Allowed = false
+        Allowed
+
     RunSchedule<public>()<suspends>:void=
         Lead := LongestCountdown()
 
@@ -280,8 +293,11 @@ hype_event_runner := class:
         Sleep(ClampLow(Config.Settings.FirstEventDelay - Lead, 0.0))
 
         loop:
-            RunCountdown()
-            RunEvent()
+            if (CanStartNow()?):
+                RunCountdown()
+                RunEvent()
+            else:
+                Log("'{Config.Label}' skipped this cycle, another event is running", ?Name := "Schedule")
 
             if (Config.Settings.ScheduleMode <> hype_schedule_mode.Repeating):
                 break
@@ -510,7 +526,7 @@ hype_beacon := class(Core.base_device):
     AnyEventRunning <public>()<transacts>:logic=
         for (Runner : Runners, Runner.IsRunning?):
             return true
-        false
+        return false
 
     StartEvent <public>(Index : int):void=
         if (Runner := Runners[Index]):
